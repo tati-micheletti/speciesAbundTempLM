@@ -56,7 +56,7 @@ The module requires only two rasters, one with abundance, and one with temperatu
 Table \@ref(tab:moduleInputs-speciesAbundTempLM) shows the full list of module inputs.
 
 ```{r moduleInputs-speciesAbundTempLM, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_inputs <- SpaDES.core::moduleInputs("speciesAbundTempLM", "C:/Users/Tati/Documents/GitHub")
+df_inputs <- SpaDES.core::moduleInputs("speciesAbundTempLM", "~/integratingSpaDESmodules/SpaDES_Modules")
 knitr::kable(df_inputs,
              caption = "List of (ref:speciesAbundTempLM) input objects and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
@@ -65,7 +65,7 @@ knitr::kable(df_inputs,
 Here is a summary of parameters (Table \@ref(tab:moduleParams-speciesAbundTempLM))
 
 ```{r moduleParams-speciesAbundTempLM, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_params <- SpaDES.core::moduleParams("speciesAbundTempLM", "C:/Users/Tati/Documents/GitHub")
+df_params <- SpaDES.core::moduleParams("speciesAbundTempLM", "~/integratingSpaDESmodules/SpaDES_Modules")
 knitr::kable(df_params, caption = "List of (ref:speciesAbundTempLM) parameters and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
@@ -79,7 +79,7 @@ The module starts in the first year by checking if data for abundance is availab
 Description of the module outputs (Table \@ref(tab:moduleOutputs-speciesAbundTempLM)).
 
 ```{r moduleOutputs-speciesAbundTempLM, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_outputs <- SpaDES.core::moduleOutputs("speciesAbundTempLM", "C:/Users/Tati/Documents/GitHub")
+df_outputs <- SpaDES.core::moduleOutputs("speciesAbundTempLM", "~/integratingSpaDESmodules/SpaDES_Modules")
 knitr::kable(df_outputs, caption = "List of (ref:speciesAbundTempLM) outputs and their description.") %>%
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
@@ -93,3 +93,5 @@ and `temperature` as a way of demonstrating `SpaDES`.
 
 Detailed module creation and functioning can be found at `https://html-preview.github.io/?url=https://github.com/tati-micheletti/EFI_webinar/blob/main/HandsOn.html`
 
+- Please use GitHub issues (https://github.com/tati-micheletti/speciesAbundTempLM/issues/new) 
+if you encounter any problems in using this module.

@@ -33,7 +33,7 @@ defineModule(sim, list(
                   desc = "Dataset in the form of a data.table with abundance and temperature"),
     createsOutput(objectName = "abundTempLM", 
                   objectClass = "lm", 
-                  desc = paste0("A fitted model (of the `lm` class) of abundance in function",
+                  desc = paste0("A fitted model (of the `lm` class) of abundance as a function",
                                 " of temperature.")),
     createsOutput(objectName = "forecasts", 
                   objectClass = "SpatRaster", 
