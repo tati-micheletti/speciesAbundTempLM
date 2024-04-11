@@ -86,7 +86,8 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
     },
     modelBuilding = {
 
-      sim$abundTempLM <- lm(abundance ~ temperature, data = sim$modDT)
+      sim$abundTempLM <- glm(abundance ~ temperature, data = sim$modDT, 
+                             family = "poisson")
       
       # Schedule the next events
       sim <- scheduleEvent(sim, time(sim), "speciesAbundTempLM", "abundanceForecasting")
@@ -97,12 +98,12 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
       names(newData) <- "temperature"
       forecVals <- round(as.numeric(predict(object = sim$abundTempLM, newdata = newData)), 0)
       forecastRas <- setValues(x = sim$tempRas, values = forecVals)
+      names(forecastRas) <- paste0("ForecastedAbundance_", time(sim))
       sim$forecasts[[paste0("Year", time(sim))]] <- forecastRas
       
       sim <- scheduleEvent(sim, time(sim) + 1, "speciesAbundTempLM", "abundanceForecasting")
     },
     plot = {
-      
       terra::plot(sim$forecasts[[paste0("Year", time(sim))]], 
                   main = paste0("Forecasted abundance: ", time(sim)))
       if (time(sim) == end(sim)){
@@ -113,11 +114,8 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
                                   strsplit(x = names(sim$abundaRas),
                                            split = ": ")[[1]][2], 
                                   " and ",
-                                  time(sim)), col = c("#67001F", "#B2182B", "#D6604D",
-                                                      "#F7F7F7", 
-                                                      "#D1E5F0", "#92C5DE", "#4393C3", 
-                                                      "#2166AC", "#053061", "#032143", 
-                                                      "#010f1e"))
+                                  time(sim)), col = c("#49006A", "#7A0177", "#AE017E", "#DD3497", "#F768A1", "#FA9FB5", 
+                                                      "#FCC5C0", "#FDE0DD", "#FFF7F3"))
         allForecasts <- rast(sim$forecasts)
         terra::writeRaster(x = allForecasts,
                            filetype = "GTiff",
