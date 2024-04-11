@@ -45,15 +45,14 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 ### Module summary
 
-Provide a brief summary of what the module does / how to use the module.
-
-Module documentation should be written so that others can use your module.
-This is a template for module documentation, and should be changed to reflect your module.
+The species abundance temperature Linear Model aims at fitting a linear model to abundance and temperature,
+and plotting abundance forecasts, as well as the difference between abundance in the last year of forecasts and 
+first year of abundance data.
 
 ### Module inputs and parameters
 
-Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
-If `sourceURL` is specified, `downloadData("speciesAbundTempLM", "C:/Users/Tati/Documents/GitHub")` may be sufficient.
+The module requires only two rasters, one with abundance, and one with temperature data.
+
 Table \@ref(tab:moduleInputs-speciesAbundTempLM) shows the full list of module inputs.
 
 ```{r moduleInputs-speciesAbundTempLM, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
@@ -63,8 +62,7 @@ knitr::kable(df_inputs,
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
-Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams-speciesAbundTempLM))
-
+Here is a summary of parameters (Table \@ref(tab:moduleParams-speciesAbundTempLM))
 
 ```{r moduleParams-speciesAbundTempLM, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("speciesAbundTempLM", "C:/Users/Tati/Documents/GitHub")
@@ -74,15 +72,7 @@ knitr::kable(df_params, caption = "List of (ref:speciesAbundTempLM) parameters a
 
 ### Events
 
-Describe what happens for each event type.
-
-### Plotting
-
-Write what is plotted.
-
-### Saving
-
-Write what is saved.
+The module starts in the first year by checking if data for abundance is available. The first year of which abundance data is not available, the module uses the data from both previous modules up to that point (i.e., 2022), and fits a linear model to it. Then the module performs forecasts for each year abundance data is not available (i.e., after 2022) and plots the results. This is done every year until the last one (2032), when the module calculates the differences between the last year’s forecasts and the first year of abundance data, and plots it.
 
 ### Module outputs
 
@@ -96,8 +86,10 @@ knitr::kable(df_outputs, caption = "List of (ref:speciesAbundTempLM) outputs and
 
 ### Links to other modules
 
-Describe any anticipated linkages to other modules, such as modules that supply input data or do post-hoc analysis.
+This module is stand-alone, but has been created to be ran with the module `speciesAbundance` 
+and `temperature` as a way of demonstrating `SpaDES`.
 
 ### Getting help
 
--   provide a way for people to obtain help (e.g., module repository issues page)
+Detailed module creation and functioning can be found at `https://html-preview.github.io/?url=https://github.com/tati-micheletti/EFI_webinar/blob/main/HandsOn.html`
+
