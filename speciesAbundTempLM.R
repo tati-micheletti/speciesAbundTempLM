@@ -16,8 +16,10 @@ defineModule(sim, list(
   documentation = list("NEWS.md", "README.md", "speciesAbundTempLM.Rmd"),
   reqdPkgs = list("SpaDES.core (>= 2.0.3)", "terra", "reproducible", "ggplot2"),
   parameters = bindrows(
-    defineParameter("modelBuildingTime", "numeric", 2022, start(sim), end(sim),
-                    "Describes the simulation time at which the model building event should occur.")
+    defineParameter(".plotInitialTime", "numeric", NA, NA, NA,
+                    "Describes the simulation time at which the first plot event should occur."),
+    defineParameter(".plotInterval", "numeric", NA, NA, NA,
+                    "Describes the simulation time interval between plot events."),
   ),
   inputObjects = bindrows(
     expectsInput(objectName = "abundaRas", objectClass = "SpatRaster", 
@@ -52,9 +54,6 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
       sim$forecasts <- list()
       # schedule future event(s)
       sim <- scheduleEvent(sim, start(sim), "speciesAbundTempLM", "tableBuilding")
-      sim <- scheduleEvent(sim, P(sim)$modelBuildingTime + 1, "speciesAbundTempLM", "modelBuilding", eventPriority = .last())
-      sim <- scheduleEvent(sim, P(sim)$modelBuildingTime + 1, "speciesAbundTempLM", "abundanceForecasting", eventPriority = .last())
-      sim <- scheduleEvent(sim, P(sim)$modelBuildingTime + 1, "speciesAbundTempLM", "plot", eventPriority = .last())
     },
     tableBuilding = {
       rasOverlay <- tryCatch({
@@ -66,23 +65,37 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
               !rasOverlay))
         stop("Both abundaRas and tempRas must be provided, must overlay, and can't be NULL")
       
-      sim$modDT <- buildModTable(abundance = sim$abundaRas, 
-                                 temperature = sim$tempRas,
-                                 currentTime = time(sim),
-                                 currModDT = sim$modDT)
-      
-      sim <- scheduleEvent(sim, time(sim) + 1, "speciesAbundTempLM", "tableBuilding")
+      # Check last abundance data matches the current year. If so, it means that there is 
+      # still data available and we shouldn't build the model quite yet. When the data (Year) 
+      # from abundRas doesn't match the current year, it means we don't have data for the 
+      # abundance anymore and should build the model for forecasts   
+
+      if (as.numeric(strsplit(x = names(sim$abundaRas), 
+                              split = ": ")[[1]][2]) < time(sim)){
+        
+        sim <- scheduleEvent(sim, time(sim), "speciesAbundTempLM", "modelBuilding")
+        
+      } else {
+        sim$modDT <- buildModTable(abundance = sim$abundaRas, 
+                                   temperature = sim$tempRas,
+                                   currentTime = time(sim),
+                                   currModDT = sim$modDT)
+        
+        sim <- scheduleEvent(sim, time(sim) + 1, "speciesAbundTempLM", "tableBuilding")
+      }
     },
     modelBuilding = {
 
       sim$abundTempLM <- lm(abundance ~ temperature, data = sim$modDT)
       
+      # Schedule the next events
+      sim <- scheduleEvent(sim, time(sim), "speciesAbundTempLM", "abundanceForecasting")
+      sim <- scheduleEvent(sim, time(sim), "speciesAbundTempLM", "plot")
     },
     abundanceForecasting = {
-      
       newData <- data.table(values(sim$tempRas))
       names(newData) <- "temperature"
-      forecVals <- as.numeric(predict(object = sim$abundTempLM, newdata = newData))
+      forecVals <- round(as.numeric(predict(object = sim$abundTempLM, newdata = newData)), 0)
       forecastRas <- setValues(x = sim$tempRas, values = forecVals)
       sim$forecasts[[paste0("Year", time(sim))]] <- forecastRas
       
@@ -94,13 +107,17 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
                   main = paste0("Forecasted abundance: ", time(sim)))
       if (time(sim) == end(sim)){
         sim$forecastedDifferences <- sim$forecasts[[paste0("Year", 
-                                                           time(sim))]]-sim$forecasts[[paste0("Year", 
-                                                                                              P(sim)$modelBuildingTime + 1)]]
+                                                           time(sim))]]-sim$abundaRas
         terra::plot(sim$forecastedDifferences, 
                     main = paste0("Difference in abundance between ", 
-                                  P(sim)$modelBuildingTime + 1, 
+                                  strsplit(x = names(sim$abundaRas),
+                                           split = ": ")[[1]][2], 
                                   " and ",
-                                  time(sim)))
+                                  time(sim)), col = c("#67001F", "#B2182B", "#D6604D",
+                                                      "#F7F7F7", 
+                                                      "#D1E5F0", "#92C5DE", "#4393C3", 
+                                                      "#2166AC", "#053061", "#032143", 
+                                                      "#010f1e"))
         allForecasts <- rast(sim$forecasts)
         terra::writeRaster(x = allForecasts,
                            filetype = "GTiff",
