@@ -9,7 +9,7 @@ defineModule(sim, list(
                                 email = "tati.micheletti@gmail.com", comment = NULL)), 
                       class = "person"),
   childModules = character(0),
-  version = list(speciesAbundTempLM = "1.0.0"),
+  version = list(speciesAbundTempLM = "1.1.0"),
   timeframe = as.POSIXlt(c(2013, 2032)),
   timeunit = "year",
   citation = list("citation.bib"),
