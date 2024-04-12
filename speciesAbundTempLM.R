@@ -97,7 +97,7 @@ doEvent.speciesAbundTempLM = function(sim, eventTime, eventType) {
       newData <- data.table(values(sim$tempRas))
       names(newData) <- "temperature"
       forecVals <- round(as.numeric(predict(object = sim$abundTempLM, newdata = newData)), 0)
-      forecastRas <- setValues(x = sim$tempRas, values = forecVals)
+      forecastRas <- terra::setValues(x = sim$tempRas, values = forecVals)
       names(forecastRas) <- paste0("ForecastedAbundance_", time(sim))
       sim$forecasts[[paste0("Year", time(sim))]] <- forecastRas
       
