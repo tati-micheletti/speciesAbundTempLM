@@ -2,6 +2,8 @@
 ## by *Tati Micheletti*    
 2024-03-21
 
+[![DOI](https://zenodo.org/badge/777838850.svg)](https://zenodo.org/doi/10.5281/zenodo.10964466)
+
 ## Introduction 
 
 This module is the third of three, and created to provides a simple and yet comprehensive example of integrating SpaDES 
